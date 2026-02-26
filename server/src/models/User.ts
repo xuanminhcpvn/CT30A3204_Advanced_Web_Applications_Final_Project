@@ -8,9 +8,9 @@ interface IUser extends Document {
     username: string,
     email: string,
     password?: string,
-    googleId?:string,
+    googleId?: string,
     displayName:string,
-    profilePicture?:string,
+    profilePicture?: string,
     settings: {
         theme: "light" | "dark",
         language: "en" | "fi"

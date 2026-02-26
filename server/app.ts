@@ -7,6 +7,7 @@ import dotenv from "dotenv";////loads environment variables from a .env file int
 import cors, {CorsOptions} from "cors";
 import router from "./src/routes/index";
 import { Request, Response } from "express";
+import cookieParser from "cookie-parser";//this is convenient to parse cookie contents, without parsing cookie will be undefined when we want to access it
 //2. create Express application instance
 //Note for myself ts require type definition here we have Express, but what express() means
 //Ans: express() = function
@@ -25,6 +26,7 @@ db.on("error", console.error.bind(console, "MongoDB connection error"));
 //By default CORS block proxying cross origin sources through scripts
 /*Now, if we run NODE_ENV=development npm run dev:server (or Windows users SET NODE_ENV=development& npm run dev:server), the server allows requests from http://localhost:3000.*/
 //5. Middlewares
+app.use(cookieParser());
 app.use(express.json());//app can read JSON data sent from the client 
 app.use(express.urlencoded({extended: false}));// parse URL-encoded form data, making it accessible as a JavaScript object in req.body
 //extended = Allows parsing of nested objects and arrays using the qs library.
