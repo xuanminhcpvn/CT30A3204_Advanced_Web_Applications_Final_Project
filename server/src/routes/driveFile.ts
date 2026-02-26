@@ -7,7 +7,7 @@ import {Router} from "express";
 //All actions that need authorization use validateToken function
 
 const router: Router = Router();
-
+/*
 router.get("files");//receive all files
 router.post("files");//create a document
 router.get("files/:id")//get full document for owner/collaborator (used by editor page )
@@ -21,4 +21,5 @@ router.get("files/:id/download")//to download document as PDF
 router.post("files/:id/lock");//user request to start editing
 router.post("files/:id/unlock");//when user stops editing or closes editor
 router.get("files/:id/lock");//check current locks status Response: { isLocked, lockedByUserId?, lockedAt?, canCurrentUserTakeOver? } 
+*/
 export default router;
