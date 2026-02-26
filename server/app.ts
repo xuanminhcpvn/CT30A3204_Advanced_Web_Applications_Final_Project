@@ -5,7 +5,7 @@ import morgan from "morgan"; //Morgan is used to see request and response logs i
 import mongoose, {Connection } from 'mongoose';
 import dotenv from "dotenv";////loads environment variables from a .env file into process.env at the sametime hides the secret contents from users and remote devs?
 import cors, {CorsOptions} from "cors";
-//import router from "./src/routes/index";
+import router from "./src/routes/index";
 import { Request, Response } from "express";
 //2. create Express application instance
 //Note for myself ts require type definition here we have Express, but what express() means
@@ -31,7 +31,7 @@ app.use(express.json());//app can read JSON data sent from the client
 app.use(express.urlencoded({extended: false}));// parse URL-encoded form data, making it accessible as a JavaScript object in req.body
 //extended = Allows parsing of nested objects and arrays using the qs library.
 app.use(morgan("dev"));//dev logs
-//app.use("/api", router);
+app.use("/api", router);
 //7: Backend access settings must define paths for every routers
 //app.use(express.static(path.join(__dirname, "../public"))); //serve static files such as images, CSS files, and JavaScript files disable static public path
 if (process.env.NODE_ENV === "development") {

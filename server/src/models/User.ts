@@ -7,7 +7,7 @@ import mongoose, {Document, Schema} from "mongoose";
 interface IUser extends Document {
     username: string,
     email: string,
-    hashedPassword?: string,
+    password?: string,
     googleId?:string,
     displayName:string,
     profilePicture?:string,
@@ -29,7 +29,7 @@ const userSchema: Schema = new Schema({
         required: true,
         unique: true
     },
-    hashedPassword: {
+    password: {
         type: String,
         required: false
     },
