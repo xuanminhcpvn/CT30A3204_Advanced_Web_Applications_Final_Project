@@ -1,7 +1,13 @@
 import bcrypt from 'bcrypt';
 import { User, IUser} from "../models/User";
 import { Request, Response } from "express";
-
+import jwt, {JwtPayload} from "jsonwebtoken";
+import {Session} from "../models/Session";
+import crypto from "crypto";
+import dotenv from "dotenv";
+const ACCESS_TOKEN_TTL = "30m";
+const REFRESH_TOKEN_TTL = 14*24*60*60*1000 //14 days in milliseconds
+dotenv.config();
 export const register = async (req: Request, res: Response) => {
     try {
         //validation
@@ -32,5 +38,51 @@ export const register = async (req: Request, res: Response) => {
         return res.status(500).json({message: "Internal server error"});
     }
 } 
+export const login = async (req: Request, res: Response) => {
+    try {
+        const {username, password} = req.body;
+        if (!username || !password){
+            return res.status(400).json({message: "username or password not found"})
+        }
+        //Check that user exists
+        const user: IUser | null = await User.findOne({ username });
+        if (!user){
+            return res.status(401).json({message: "username or password is incorrect"});
+        }
+        //compare hashedpassword in database and compare with password input
+        const correctPassword = await bcrypt.compare(password, user.password as string);
 
-
+        if (!correctPassword) {
+            return res.status(401).json({message: "Login failed"});
+        }
+        //Do passwords match 
+        const jwtPayload: JwtPayload = {
+            userId: user._id,
+            username: user.username
+        }
+        //console.log(`jwtPayload: ${jwtPayload}`)
+        const accessToken: string = jwt.sign(jwtPayload, process.env.ACCESS_TOKEN_SECRET as string, {expiresIn: ACCESS_TOKEN_TTL});
+        //Create refresh token 
+        const refreshToken: string = crypto.randomBytes(64).toString('hex');
+        //must implement a session schme to sture refresh token in database 
+        await Session.create({
+            userId: user._id,
+            refreshToken,
+            expiredAt: new Date (Date.now() + REFRESH_TOKEN_TTL)
+        })
+        //refresh token can be stored in cookie
+        //cookies settings httpOnly prevent js injection, secure only allow https connection,
+        // sameSite relates to CORS  "none" = allow cross-site access to cookie "strict"= only same site as the cookie entry is created
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: "lax",
+            maxAge: REFRESH_TOKEN_TTL
+        })
+        //return access token in response.body
+        return res.status(200).json({message: `User ${user.displayName} is logged in!`, accessToken})
+    } catch (err:any) {
+        console.error(`Error while login: ${err}`);
+        return res.status(500).json({message: "Internal server error"});
+    }
+}

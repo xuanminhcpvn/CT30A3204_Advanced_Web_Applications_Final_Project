@@ -2,14 +2,14 @@
     Done by: Minh Pham
     Created at: 26/02/2026
 */
-import mongoose, {Document, Schema, StringSchemaDefinition} from "mongoose";
+import mongoose, {Document, Schema, Types} from "mongoose";
 //custom type
 
 interface IDriveFolder extends Document {
   name: string;
-  ownerId: string;
-  parentFolderId?: string | null;
-  permissions: { userId: string; role: "viewer" | "editor" }[];
+  ownerId: Types.ObjectId;
+  parentFolderId?: Types.ObjectId | null;
+  permissions: { userId: Types.ObjectId; role: "viewer" | "editor" }[];
   visibility: "private" | "public" | "link";
   shareLink?: string | null;
   isFavorite: boolean;
@@ -19,21 +19,21 @@ interface IDriveFolder extends Document {
 
 const driveFolderSchema: Schema = new Schema({
     name: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     ownerId: {
-        type: String,
-        required: true
+      type: mongoose.Schema.Types.ObjectId,
+      required: true
     },
     parentFolderId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
       default: null,
     },
     permissions: [
       {
         userId: {
-          type: String,
+          type: mongoose.Schema.Types.ObjectId,
           required: true,
         },
         role: {

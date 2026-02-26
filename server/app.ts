@@ -23,8 +23,6 @@ const db: Connection = mongoose.connection;
 db.on("error", console.error.bind(console, "MongoDB connection error"));
 //5. setting corse options
 //By default CORS block proxying cross origin sources through scripts
-console.log("NODE_ENV =", process.env.NODE_ENV);
-
 /*Now, if we run NODE_ENV=development npm run dev:server (or Windows users SET NODE_ENV=development& npm run dev:server), the server allows requests from http://localhost:3000.*/
 //5. Middlewares
 app.use(express.json());//app can read JSON data sent from the client 
@@ -61,6 +59,7 @@ if (process.env.NODE_ENV === "development") {
    
 }
 
+console.log("NODE_ENV =", process.env.NODE_ENV as string);
 //8. Then the app must listen to certain port to communicate with other processes and nodes
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
