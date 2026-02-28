@@ -7,9 +7,9 @@ import { tokenCreation } from "../utils/tokenCreationHelper";
 //import crypto from "crypto";
 import dotenv from "dotenv";
 import { Profile } from 'passport';
+import jwt from "jsonwebtoken";
 
-//const ACCESS_TOKEN_TTL = "30m";
-//const REFRESH_TOKEN_TTL = 14*24*60*60*1000 //14 days in milliseconds
+const ACCESS_TOKEN_TTL = "30m";
 dotenv.config();
 export const register = async (req: Request, res: Response) => {
     try {
@@ -129,6 +129,36 @@ export const logout = async (req: Request, res: Response) => {
         return res.sendStatus(200).json({message:`Logged out`})
     } catch (err:any) {
         console.error(`Error while logout: ${err}`);
+        return res.status(500).json({message: "Internal server error"});
+    }
+}
+
+export const refreshAccessToken = async (req: Request, res:Response) => {
+
+    try {
+        //extract refresh token from cookie
+        const refreshToken = req.cookies?.refreshToken;
+
+        if(!refreshToken) {
+            return res.status(401).json({message: "Refresh token does not exist"});
+        }
+        //compare with refresh token in database
+        const session = await Session.findOne({refreshToken: refreshToken});
+        
+        if(!session) {
+            return res.status(403).json({message: "Refresh token invalid or was expired"});
+        }
+
+        //Check whether access token is expired
+
+        if(session.expiredAt <new Date()){ 
+            return res.status(403).json({message: "Refresh token is expired"}) 
+        }
+        //create new access token, taking userId from session!
+        const newAccessToken: string = jwt.sign({userId: session.userId,}, process.env.ACCESS_TOKEN_SECRET as string, {expiresIn: ACCESS_TOKEN_TTL});
+        return res.status(200).json({newAccessToken});
+    } catch (err) {
+        console.error("Error while requesting new access token from server");   
         return res.status(500).json({message: "Internal server error"});
     }
 }

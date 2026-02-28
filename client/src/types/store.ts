@@ -5,5 +5,11 @@ export interface AuthState {
     user: IUser | null;
     loading: boolean;
 
-    registerFunc: (username: string, password: string, email:string, displayName: string) => Promise<Boolean>
+    clearState: () => void;
+    setAccessToken: (accessToken:string) => void;
+    registerFunc: (username: string, password: string, email:string, displayName: string) => Promise<void>
+    login: (username:string, password:string) => Promise<void>
+    logout: () => Promise<void>;
+    fetchUser: () => Promise<void>;
+    refreshAccessToken: () => Promise<void>
 }

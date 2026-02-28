@@ -31,11 +31,9 @@ export function RegisterForm({className,...props}: React.ComponentProps<"div">) 
   const onSubmit = async (data: registerFormValues) => {
     const {username, email, password, displayName} = data;
       //call backend to register
-      const success = await registerFunc(username, password, email, displayName);
+      await registerFunc(username, password, email, displayName);
       //if successful, redirect to login
-      if (success){
-        navigate("/login");
-      }
+      navigate("/login");
     }
   //onSubmit to 
   return (

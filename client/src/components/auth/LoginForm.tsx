@@ -6,6 +6,8 @@ import { Button } from "../ui/button";
 import {z} from "zod";//this with react-hook-form will validate userInput //I don't think we have any restriction whether it is handled in front-end or back-end
 import {useForm} from "react-hook-form";//handle formstate
 import {zodResolver} from "@hookform/resolvers/zod";//resolve zod with react-hook-form
+import { useAuthStore } from "@/stores/useAuthStore";
+import { useNavigate } from "react-router";
 
 const loginSchema = z.object({
   username: z.string().min(5, "Username is required and must be at least 5 characters long"),//must have at least one character
@@ -17,13 +19,17 @@ type loginFormValues = z.infer<typeof loginSchema>
 export function LoginForm({className,...props}: React.ComponentProps<"div">) {
   //register is part of useForm event, can't name it to login here
   //For login to work, in each input element we must state which attribute the input refer
+  const {login} = useAuthStore();
+  const navigate = useNavigate();
   const {register, handleSubmit, formState: {errors, isSubmitting}} = useForm<loginFormValues>({
     resolver: zodResolver(loginSchema)
   }); 
 
   //onSubmit => interact with backend
   const onSubmit = async (data: loginFormValues) => {
-    console.log(data);
+    const {username, password} = data; 
+    await login(username, password);
+    navigate("/drive/home"); //restriction on
   }
   //onSubmit to 
   return (
